@@ -1,7 +1,7 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Responder, middleware::Logger};
+use actix_web::{web, App, HttpServer, middleware, http::ContentEncoding};
 use env_logger::Env;
 
-use crate::handlers;
+use crate::{handlers};
 
 fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -15,7 +15,8 @@ pub async fn start() -> std::io::Result<()>{
 
     HttpServer::new(|| {
         App::new()
-            .wrap(Logger::new("Request: %r, Status: %s, Time: %Dms, Size: %bb, Remote-Ip: %a"))
+            .wrap(middleware::Compress::new(ContentEncoding::Gzip))
+            .wrap(middleware::Logger::new("Request: %r, Status: %s, Time: %Dms, Size: %bb, Remote-Ip: %a"))
             .configure(config)
     })
     .bind("127.0.0.1:8088")?

@@ -1,5 +1,10 @@
-use actix_web::{Responder};
+use crate::CLIENT;
+use actix_web::{Responder, HttpResponse};
 
 pub async fn stats() -> impl Responder {
-    "Stats"
+    let client = &CLIENT;
+
+    let res = client.get("https://www.rust-lang.org").await;
+
+    HttpResponse::Ok().json(res)
 }
