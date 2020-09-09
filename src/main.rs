@@ -18,10 +18,10 @@ lazy_static! {
 async fn main() -> std::io::Result<()> {
     let mut workers = vec!();
 
-    for _ in  0..500 {
+    for _ in  0..100 {
         let worker = tokio::spawn(async move {
-            let mut runner = runner::Runner::new(&CLIENT);
-            runner.start("http://localhost:3000", 5).await
+            let mut runner = runner::Runner::new();
+            runner.run_with_duration("http://localhost:3000", 5).await
         });
 
         workers.push(worker);

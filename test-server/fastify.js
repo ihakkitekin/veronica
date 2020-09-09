@@ -4,7 +4,7 @@ const fastify = require('fastify')();
 let count = 0;
 
 fastify.get('*', async (request, reply) => {
-  console.log('Request: ', ++count);
+  process.stdout.write(`connection: ${fastify.server.connections}, count: ${++count}\n`);
 
   return 'Hello, world!';
 })
