@@ -663,6 +663,7 @@ dependencies = [
  "futures-core",
  "futures-task",
  "futures-util",
+ "num_cpus",
 ]
 
 [[package]]
@@ -1872,6 +1873,7 @@ dependencies = [
  "futures",
  "lazy_static",
  "log",
+ "num_cpus",
  "reqwest",
  "serde",
  "serde_json",
