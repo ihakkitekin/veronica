@@ -33,6 +33,14 @@ impl Collector {
         stats.clone()
     }
 
+    pub fn reset() {
+        let mut stats = STATS
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+
+        *stats = Stats::default();
+    }
+
     fn process(response: &HttpResponse) {
         let mut stats = STATS
             .lock()

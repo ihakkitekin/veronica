@@ -41,9 +41,22 @@ async function stopRunner(): Promise<ApiResponse<boolean>> {
   }
 }
 
+async function resetRunner(): Promise<ApiResponse<boolean>> {
+  try {
+    await axios.post('/api/runner/reset');
+
+    return { result: true };
+  } catch (error) {
+    const errorMessage = error.response?.data.message || error.message;
+
+    return { error: errorMessage }
+  }
+}
+
 
 export default {
   getStats,
   startRunner,
-  stopRunner
+  stopRunner,
+  resetRunner
 }

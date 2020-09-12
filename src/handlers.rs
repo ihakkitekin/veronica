@@ -36,6 +36,12 @@ pub async fn stop_runner(data: web::Data<ServerState>) -> impl Responder {
     HttpResponse::Ok()
 }
 
+pub async fn reset() -> impl Responder {
+    Collector::reset();
+
+    HttpResponse::Ok()
+}
+
 #[derive(Deserialize)]
 pub struct StartRunnerQuery {
     url: String,
