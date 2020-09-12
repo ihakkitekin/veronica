@@ -15,13 +15,13 @@ impl Runner {
         }
     }
 
-    pub async fn run_with_duration(&mut self, url: &str, duration_as_secs: u64) {
+    pub async fn run_with_duration(&mut self, url: String, duration_as_secs: u64) {
         let _ = timeout(Duration::from_secs(duration_as_secs), self.run(url)).await;
     }
 
-    pub async fn run(&mut self, url: &str) {
+    pub async fn run(&mut self, url: String) {
         loop {
-            let res = self.client.get(url).await;
+            let res = self.client.get(&url).await;
             let _ = self.tx.send(res).await;
         }
     }

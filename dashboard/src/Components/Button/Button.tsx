@@ -7,16 +7,16 @@ export enum ButtonTypes {
   Error = 'error'
 }
 
-export function Button({ children, onClick, buttonType }: React.PropsWithChildren<ButtonProps>) {
-  const classNames = classnames('button', {
+export function Button({ children, buttonType, ...restProps }: React.PropsWithChildren<ButtonProps>) {
+  const classNames = classnames(restProps.className, 'button', {
     'button-success': buttonType === ButtonTypes.Success,
     'button-error': buttonType === ButtonTypes.Error,
   });
 
-  return <button className={classNames} onClick={onClick}>{children}</button>
+  return <button {...restProps} className={classNames}>{children}</button>
 }
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   buttonType: ButtonTypes;
 }

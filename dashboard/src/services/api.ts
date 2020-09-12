@@ -14,10 +14,12 @@ async function getStats(): Promise<ApiResponse<RunnerResponse>> {
   }
 }
 
-async function startRunner(): Promise<ApiResponse<boolean>> {
+async function startRunner(url: string, workerCount: number): Promise<ApiResponse<boolean>> {
   try {
-    // TODO: Make this post
-    await axios.get<RunnerResponse>('/api/runner/start');
+    await axios.post('/api/runner/start', {
+      url,
+      worker_count: workerCount
+    });
 
     return { result: true };
   } catch (error) {
@@ -29,8 +31,7 @@ async function startRunner(): Promise<ApiResponse<boolean>> {
 
 async function stopRunner(): Promise<ApiResponse<boolean>> {
   try {
-    // TODO: Make this post
-    await axios.get<RunnerResponse>('/api/runner/stop');
+    await axios.post('/api/runner/stop');
 
     return { result: true };
   } catch (error) {

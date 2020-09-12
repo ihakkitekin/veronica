@@ -25,7 +25,7 @@ impl<'a> TaskManager {
         task_manager
     }
 
-    pub fn start_runner(&mut self, worker_count: u32){
+    pub fn start_runner(&mut self, url: &str, worker_count: u64){
         match self.status {
             TaskStatus::Stopped => {
                 self.status = TaskStatus::Running;
@@ -34,9 +34,10 @@ impl<'a> TaskManager {
                 for _ in 0..worker_count {
                     let tx_copy = self.tx.clone();
         
+                    let runner_url = String::from(url);
                     let worker = async move {
                         let mut runner = Runner::new(tx_copy);
-                        runner.run("http://localhost:3001").await
+                        runner.run(runner_url).await
                     };
         
                     let (abort_handle, abort_registration) = AbortHandle::new_pair();
