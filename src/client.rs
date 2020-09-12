@@ -4,7 +4,7 @@ use tokio::time::Instant;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct HttpResponse {
     pub status: u16,
     pub time: u128,

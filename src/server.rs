@@ -1,5 +1,7 @@
 use actix_web::{http::ContentEncoding, middleware, web, App, HttpServer};
 use env_logger::Env;
+use tokio;
+use actix_rt;
 
 use crate::handlers;
 
@@ -10,7 +12,10 @@ fn config(cfg: &mut web::ServiceConfig) {
 pub async fn start() -> std::io::Result<()> {
     env_logger::from_env(Env::default().default_filter_or("info")).init();
 
-    HttpServer::new(|| {
+    let local = tokio::task::LocalSet::new();
+    let sys = actix_rt::System::run_in_tokio("server", &local);
+
+    let _ = HttpServer::new(|| {
         App::new()
             .wrap(middleware::Compress::new(ContentEncoding::Gzip))
             .wrap(middleware::Logger::new(
@@ -20,5 +25,7 @@ pub async fn start() -> std::io::Result<()> {
     })
     .bind("127.0.0.1:8088")?
     .run()
-    .await
+    .await;
+
+    sys.await
 }

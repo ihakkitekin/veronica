@@ -1,33 +1,26 @@
 #[macro_use]
 extern crate lazy_static;
 
-use futures::future::join_all;
-use tokio;
+use std::sync::{Arc, Mutex};
 
 mod client;
 mod handlers;
 mod runner;
+mod collector;
+mod task_manager;
 mod server;
 
+use client::HttpResponse;
+use task_manager::TaskManager;
+
 lazy_static! {
-    static ref CLIENT: client::Client = client::Client::new();
+    pub static ref STATS: Arc<Mutex<Vec<HttpResponse>>> = Arc::new(Mutex::new(vec!()));
 }
 
-#[actix_rt::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let mut workers = vec![];
+    let mut task_manager = TaskManager::new();
+    task_manager.start_runner(1, 1);
 
-    for _ in 0..100 {
-        let worker = tokio::spawn(async move {
-            let mut runner = runner::Runner::new();
-            runner.run_with_duration("http://localhost:3000", 5).await
-        });
-
-        workers.push(worker);
-    }
-
-    join_all(workers).await;
-
-    Ok(())
-    // server::start().await
+    server::start().await
 }

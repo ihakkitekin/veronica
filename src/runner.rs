@@ -1,31 +1,29 @@
 use crate::client::{Client, HttpResponse};
-use futures::future::Future;
+use futures::future::{Future};
 use tokio::time::{timeout, Duration};
+use tokio::sync::mpsc::Sender;
 
 pub struct Runner {
     client: Client,
-    stats: Vec<HttpResponse>,
+    tx: Sender<HttpResponse>
 }
 
 impl Runner {
-    pub fn new() -> Self {
+    pub fn new(tx: Sender<HttpResponse>) -> Self {
         Runner {
-            client: Client::new(),
-            stats: Vec::new(),
+            tx,
+            client: Client::new()
         }
     }
 
     pub async fn run_with_duration(&mut self, url: &str, duration_as_secs: u64) {
         let _ = timeout(Duration::from_secs(duration_as_secs), self.run(url)).await;
-
-        println!("{}", self.stats.len());
     }
 
     async fn run(&mut self, url: &str) -> Box<dyn Future<Output = ()>> {
         loop {
             let res = self.client.get(url).await;
-
-            self.stats.push(res);
+            let _ = self.tx.send(res).await;
         }
     }
 }
