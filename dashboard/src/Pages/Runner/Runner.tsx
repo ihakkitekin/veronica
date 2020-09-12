@@ -2,33 +2,32 @@ import * as React from 'react';
 import api from '../../services/api';
 import { Button, ButtonTypes } from '../../Components/Button/Button';
 import { RunnerStatus, Stats } from '../../typings';
-import './runner.css';
 import { Input } from '../../Components/Input/Input';
+import { useInterval } from '../../hooks/useInterval';
+import './runner.css';
 
 export function Runner(props: RunnerProps) {
   const [status, setStatus] = React.useState(RunnerStatus.Stopped);
   const [stats, setStats] = React.useState((undefined) as unknown as Stats);
   const [url, setUrl] = React.useState('');
   const [workerCount, setWorkerCount] = React.useState(0);
+  const [fetchPeriod, setFetchPeriod] = React.useState(0);
 
   React.useEffect(() => {
-    const getInitialState = async () => {
-      const response = await api.getStats();
+    getState();
+  }, []);
 
-      if (response.result) {
-        setStatus(response.result.status);
-        setStats(response.result.stats);
-      }
-    }
+  const getState = React.useCallback(async () => {
+    const response = await api.getStats();
 
-    getInitialState();
-
-    const interval = setInterval(getInitialState, 3000);
-
-    return () => {
-      clearInterval(interval);
+    if (response.result) {
+      setStatus(response.result.status);
+      setStats(response.result.stats);
     }
   }, []);
+
+  
+  useInterval(fetchPeriod, getState);
 
   const onStartClick = React.useCallback(async () => {
     if (!url || !workerCount) return;
@@ -50,14 +49,21 @@ export function Runner(props: RunnerProps) {
 
 
   const onUrlChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
+    setUrl(e.currentTarget.value);
   }, []);
 
   const onWorkerCountChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const workerCount = e.target.valueAsNumber;
+    const workerCount = e.currentTarget.valueAsNumber;
 
     if (workerCount >= 0) {
       setWorkerCount(workerCount);
+    }
+  }, []);
+
+  const onFetchPeriodChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const period = Number(e.currentTarget.value);
+    if (period >= 0) {
+      setFetchPeriod(period);
     }
   }, []);
 
@@ -80,6 +86,15 @@ export function Runner(props: RunnerProps) {
           <div><b>Count: </b> {stats.count}</div>
           <div><b>Average Time: </b> {stats.average_time.toFixed(2)} ms</div>
           <div><b>Error Count: </b> {stats.error_count}</div>
+        <div>
+          <b>Auto Fetch: </b>
+          <select onChange={onFetchPeriodChange}>
+            <option value="0">Turn Off</option>
+            <option value="1000">1s</option>
+            <option value="5000">5s</option>
+            <option value="10000">10s</option>
+          </select>
+        </div>
         </div>
       }
     </section >)

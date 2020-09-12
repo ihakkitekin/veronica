@@ -15,6 +15,8 @@ impl Runner {
         }
     }
 
+    // This is kept for cli, probably not going to be  used in dashboard
+    #[allow(dead_code)]
     pub async fn run_with_duration(&mut self, url: String, duration_as_secs: u64) {
         let _ = timeout(Duration::from_secs(duration_as_secs), self.run(url)).await;
     }

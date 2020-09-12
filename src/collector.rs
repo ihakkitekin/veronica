@@ -25,14 +25,6 @@ impl Collector {
         }
     }
 
-    pub fn get_stats_len() -> usize {
-        let responses = RESPONSES
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-
-        responses.len()
-    }
-
     pub fn get_stats() -> Stats {
         let stats = STATS
             .lock()
