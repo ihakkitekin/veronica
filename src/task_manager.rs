@@ -56,10 +56,12 @@ impl<'a> TaskManager {
         let _ = join_all(tasks);
     }
 
-    pub async fn stop_runner(&mut self) {
+    pub fn stop_runner(&mut self) {
         if self.state == TaskState::Stopped {
             return;
         }
+
+        self.state = TaskState::Stopped;
         
         while let Some(task) = &self.running_tasks.pop() {
             task.abort();
@@ -68,7 +70,7 @@ impl<'a> TaskManager {
 
     fn start_collector(&mut self, rx: Receiver<HttpResponse>) {
         let _ = tokio::spawn(async move {
-            Collector::new().listen(rx).await
+            Collector::listen(rx).await
         });
     }
 }
