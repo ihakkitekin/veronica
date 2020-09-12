@@ -3,9 +3,9 @@ use crate::{server_state::ServerState};
 use actix_web::{HttpResponse, Responder, web};
 
 pub async fn stats() -> impl Responder {
-    let len = Collector::get_stats_len();
+    let stats = Collector::get_stats();
 
-    HttpResponse::Ok().json(len)
+    HttpResponse::Ok().json(stats)
 }
 
 pub async fn start_runner(data: web::Data<ServerState>) -> impl Responder {
