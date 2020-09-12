@@ -1,10 +1,14 @@
 use crate::client::{HttpResponse};
-use futures::future::{join_all};
+use futures::future::{join_all, Abortable, AbortHandle};
 use tokio::sync::mpsc::{Sender, channel, Receiver};
-use crate::{collector::Collector, runner::Runner};
+use crate::{collector::Collector, runner::Runner, enums::TaskState};
 
+#[derive(Debug)]
 pub struct TaskManager {
-    tx: Sender<HttpResponse>
+    tx: Sender<HttpResponse>,
+    state: TaskState,
+    running_tasks: Vec<AbortHandle>,
+    test: Vec<u32>
 }
 
 impl<'a> TaskManager {
@@ -12,7 +16,10 @@ impl<'a> TaskManager {
         let (tx, rx) = channel::<HttpResponse>(10000);
 
         let mut task_manager = TaskManager {
-            tx
+            tx,
+            state: TaskState::Stopped,
+            running_tasks: vec!(),
+            test: vec!()
         };
 
         task_manager.start_collector(rx);
@@ -20,21 +27,43 @@ impl<'a> TaskManager {
         task_manager
     }
 
-    pub fn start_runner(&mut self, worker_count: u32, duration: u64){
+    pub fn start_runner(&mut self, worker_count: u32){
+        if self.state == TaskState::Running {
+            return;
+        }
+
+        self.state = TaskState::Running;
+
         let mut tasks = vec!();
         for _ in 0..worker_count {
             let tx_copy = self.tx.clone();
 
-            
-            let worker = tokio::spawn(async move {
+            let worker = async move {
                 let mut runner = Runner::new(tx_copy);
-                runner.run_with_duration("http://localhost:3000", duration).await
-            });
+                runner.run("http://localhost:3000").await
+            };
+
+            let (abort_handle, abort_registration) = AbortHandle::new_pair();
+            let abortable_task = Abortable::new(worker, abort_registration);
     
-            tasks.push(worker);
+            self.running_tasks.push(abort_handle);
+
+            let task = tokio::spawn(abortable_task);
+            tasks.push(task);
         }
 
+        self.test.push(1);
         let _ = join_all(tasks);
+    }
+
+    pub async fn stop_runner(&mut self) {
+        if self.state == TaskState::Stopped {
+            return;
+        }
+        
+        while let Some(task) = &self.running_tasks.pop() {
+            task.abort();
+        }
     }
 
     fn start_collector(&mut self, rx: Receiver<HttpResponse>) {

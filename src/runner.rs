@@ -1,5 +1,4 @@
-use crate::client::{Client, HttpResponse};
-use futures::future::{Future};
+use crate::{client::{Client, HttpResponse}};
 use tokio::time::{timeout, Duration};
 use tokio::sync::mpsc::Sender;
 
@@ -20,7 +19,7 @@ impl Runner {
         let _ = timeout(Duration::from_secs(duration_as_secs), self.run(url)).await;
     }
 
-    async fn run(&mut self, url: &str) -> Box<dyn Future<Output = ()>> {
+    pub async fn run(&mut self, url: &str) {
         loop {
             let res = self.client.get(url).await;
             let _ = self.tx.send(res).await;
