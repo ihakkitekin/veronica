@@ -1,0 +1,30 @@
+.button {
+  padding: 1rem;
+  text-align: center;
+  background-color: #49b6ff;
+  color: white;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid #efefef;
+  font-weight: 600;
+}
+
+.button:hover {
+  background-color: #49b6ffEE;
+}
+
+.button.button-success {
+  background-color:  #4c956c;
+}
+
+.button.button-success:hover {
+  background-color:  #4c956cEE;
+}
+
+.button.button-error {
+  background-color: #9b1d20;
+}
+
+.button.button-error:hover {
+  background-color: #9b1d20EE;
+}

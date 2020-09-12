@@ -1,14 +1,13 @@
 use crate::client::{HttpResponse};
 use futures::future::{join_all, Abortable, AbortHandle};
 use tokio::sync::mpsc::{Sender, channel, Receiver};
-use crate::{collector::Collector, runner::Runner, enums::TaskState};
+use crate::{collector::Collector, runner::Runner, enums::TaskStatus};
 
 #[derive(Debug)]
 pub struct TaskManager {
     tx: Sender<HttpResponse>,
-    state: TaskState,
-    running_tasks: Vec<AbortHandle>,
-    test: Vec<u32>
+    pub status: TaskStatus,
+    running_tasks: Vec<AbortHandle>
 }
 
 impl<'a> TaskManager {
@@ -17,9 +16,8 @@ impl<'a> TaskManager {
 
         let mut task_manager = TaskManager {
             tx,
-            state: TaskState::Stopped,
-            running_tasks: vec!(),
-            test: vec!()
+            status: TaskStatus::Stopped,
+            running_tasks: vec!()
         };
 
         task_manager.start_collector(rx);
@@ -28,43 +26,44 @@ impl<'a> TaskManager {
     }
 
     pub fn start_runner(&mut self, worker_count: u32){
-        if self.state == TaskState::Running {
-            return;
+        match self.status {
+            TaskStatus::Stopped => {
+                self.status = TaskStatus::Running;
+
+                let mut tasks = vec!();
+                for _ in 0..worker_count {
+                    let tx_copy = self.tx.clone();
+        
+                    let worker = async move {
+                        let mut runner = Runner::new(tx_copy);
+                        runner.run("http://localhost:3001").await
+                    };
+        
+                    let (abort_handle, abort_registration) = AbortHandle::new_pair();
+                    let abortable_task = Abortable::new(worker, abort_registration);
+            
+                    self.running_tasks.push(abort_handle);
+        
+                    let task = tokio::spawn(abortable_task);
+                    tasks.push(task);
+                }
+
+                let _ = join_all(tasks);
+            },
+            _ => {}
         }
-
-        self.state = TaskState::Running;
-
-        let mut tasks = vec!();
-        for _ in 0..worker_count {
-            let tx_copy = self.tx.clone();
-
-            let worker = async move {
-                let mut runner = Runner::new(tx_copy);
-                runner.run("http://localhost:3000").await
-            };
-
-            let (abort_handle, abort_registration) = AbortHandle::new_pair();
-            let abortable_task = Abortable::new(worker, abort_registration);
-    
-            self.running_tasks.push(abort_handle);
-
-            let task = tokio::spawn(abortable_task);
-            tasks.push(task);
-        }
-
-        self.test.push(1);
-        let _ = join_all(tasks);
     }
 
     pub fn stop_runner(&mut self) {
-        if self.state == TaskState::Stopped {
-            return;
-        }
+        match self.status {
+            TaskStatus::Running => {
+                self.status = TaskStatus::Stopped;
 
-        self.state = TaskState::Stopped;
-        
-        while let Some(task) = &self.running_tasks.pop() {
-            task.abort();
+                while let Some(task) = &self.running_tasks.pop() {
+                    task.abort();
+                }
+            },
+            _ => {}
         }
     }
 

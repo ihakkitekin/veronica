@@ -12,9 +12,11 @@ pub async fn start() -> std::io::Result<()> {
     let local = tokio::task::LocalSet::new();
     let sys = actix_rt::System::run_in_tokio("server", &local);
 
+    let state = create_state();
+
     let _ = HttpServer::new(move || {
         App::new()
-            .data(create_state())
+            .app_data(state.clone())
             .wrap(middleware::Compress::new(ContentEncoding::Gzip))
             .wrap(middleware::Logger::new(
                 "Request: %r, Status: %s, Time: %Dms, Size: %bb, Remote-Ip: %a",

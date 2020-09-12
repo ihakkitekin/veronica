@@ -1,5 +1,7 @@
-#[derive(Debug, PartialEq)]
-pub enum TaskState {
+use serde::Serialize;
+
+#[derive(Debug, Clone, Serialize)]
+pub enum TaskStatus {
   Running,
   Stopped
 }
