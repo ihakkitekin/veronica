@@ -1,12 +1,14 @@
 use crate::client::{HttpResponse};
 use futures::future::{join_all, Abortable, AbortHandle};
 use tokio::sync::mpsc::{Sender, channel, Receiver};
+use tokio::time::Instant;
 use crate::{collector::Collector, runner::Runner, enums::TaskStatus};
 
 #[derive(Debug)]
 pub struct TaskManager {
-    tx: Sender<HttpResponse>,
     pub status: TaskStatus,
+    pub started_at: Option<Instant>,
+    tx: Sender<HttpResponse>,
     running_tasks: Vec<AbortHandle>
 }
 
@@ -16,6 +18,7 @@ impl<'a> TaskManager {
 
         let mut task_manager = TaskManager {
             tx,
+            started_at: None,
             status: TaskStatus::Stopped,
             running_tasks: vec!()
         };
@@ -29,6 +32,7 @@ impl<'a> TaskManager {
         match self.status {
             TaskStatus::Stopped => {
                 self.status = TaskStatus::Running;
+                self.started_at = Some(Instant::now());
 
                 let mut tasks = vec!();
                 for _ in 0..worker_count {
@@ -59,6 +63,7 @@ impl<'a> TaskManager {
         match self.status {
             TaskStatus::Running => {
                 self.status = TaskStatus::Stopped;
+                self.started_at = None;
 
                 while let Some(task) = &self.running_tasks.pop() {
                     task.abort();

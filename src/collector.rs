@@ -1,5 +1,6 @@
 use crate::client::{HttpResponse};
 
+use tokio::time::{Instant};
 use tokio::sync::mpsc::Receiver;
 use lazy_static;
 use serde::Serialize;
@@ -25,12 +26,19 @@ impl Collector {
         }
     }
 
-    pub fn get_stats() -> Stats {
+    pub fn get_stats(started_at: Option<Instant>) -> Stats {
         let stats = STATS
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
 
-        stats.clone()
+        let mut cloned_stats = stats.clone();
+
+        if let Some(st) = started_at {
+            let duration_as_seconds = Instant::now().duration_since(st).as_secs();
+            cloned_stats.rps = (cloned_stats.count as u64) / duration_as_seconds;
+        }
+
+        cloned_stats
     }
 
     pub fn reset() {
@@ -64,7 +72,7 @@ pub struct Stats {
     count: usize,
     error_count: usize,
     average_time: f64,
-    // rps: u64
+    rps: u64
 }
 
 impl Default for Stats {
@@ -72,7 +80,8 @@ impl Default for Stats {
         Stats {
             count: 0,
             error_count: 0,
-            average_time: 0_f64
+            average_time: 0_f64,
+            rps: 0
         }
     }
 }

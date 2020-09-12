@@ -26,7 +26,7 @@ export function Runner(props: RunnerProps) {
     }
   }, []);
 
-  
+
   useInterval(fetchPeriod, getState);
 
   const onStartClick = React.useCallback(async () => {
@@ -75,8 +75,8 @@ export function Runner(props: RunnerProps) {
   return (
     <section className="runner-page">
       <div className="runner-form">
-        <Input label="Url" onChange={onUrlChange} />
-        <Input label="Worker Count" type="number" onChange={onWorkerCountChange} min={0} max={1000} />
+        <Input label="Url" value={url} onChange={onUrlChange} />
+        <Input label="Worker Count" type="number" value={workerCount} onChange={onWorkerCountChange} min={0} max={1000} />
         {
           status === RunnerStatus.Stopped
             ? <Button buttonType={ButtonTypes.Success} onClick={onStartClick}>Start</Button>
@@ -89,6 +89,7 @@ export function Runner(props: RunnerProps) {
         <div className="runner-stats">
           <div><b>Count: </b> {stats.count}</div>
           <div><b>Average Time: </b> {stats.average_time.toFixed(2)} ms</div>
+          <div><b>RPS: </b> {stats.rps}</div>
           <div><b>Error Count: </b> {stats.error_count}</div>
           <div>
             <b>Auto Fetch: </b>
@@ -99,7 +100,7 @@ export function Runner(props: RunnerProps) {
               <option value="10000">10s</option>
             </select>
           </div>
-        <Button buttonType={ButtonTypes.Error} onClick={onResetClick}>Reset</Button>
+          <Button buttonType={ButtonTypes.Error} onClick={onResetClick}>Reset</Button>
         </div>
       }
     </section >)

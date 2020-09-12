@@ -7,6 +7,7 @@ export interface Stats {
   count: number;
   error_count: number;
   average_time: number;
+  rps: number;
 }
 
 export interface Error {
