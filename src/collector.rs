@@ -35,7 +35,9 @@ impl Collector {
 
         if let Some(st) = started_at {
             let duration_as_seconds = Instant::now().duration_since(st).as_secs();
-            cloned_stats.rps = (cloned_stats.count as u64) / duration_as_seconds;
+            if duration_as_seconds > 0 {
+                cloned_stats.rps = (cloned_stats.count as u64) / duration_as_seconds;
+            }
         }
 
         cloned_stats

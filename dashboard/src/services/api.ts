@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RunnerResponse, ApiResponse } from '../typings';
+import { RunnerResponse, ApiResponse, Stats } from '../typings';
 
 async function getStats(): Promise<ApiResponse<RunnerResponse>> {
   try {
@@ -29,11 +29,11 @@ async function startRunner(url: string, workerCount: number): Promise<ApiRespons
   }
 }
 
-async function stopRunner(): Promise<ApiResponse<boolean>> {
+async function stopRunner(): Promise<ApiResponse<Stats>> {
   try {
-    await axios.post('/api/runner/stop');
+    const response = await axios.post<Stats>('/api/runner/stop');
 
-    return { result: true };
+    return { result: response.data };
   } catch (error) {
     const errorMessage = error.response?.data.message || error.message;
 

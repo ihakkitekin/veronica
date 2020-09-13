@@ -34,13 +34,20 @@ pub async fn start_runner(query: web::Json<StartRunnerQuery>, data: web::Data<Se
     HttpResponse::Ok()
 }
 
-// TODO: Return final results
 pub async fn stop_runner(data: web::Data<ServerState>) -> impl Responder {
+    #[allow(unused_assignments)]
+    let mut started_at: Option<Instant> = None;
+
     {
+        started_at = data.task_manager.lock().unwrap().started_at;
         data.task_manager.lock().unwrap().stop_runner();
     }
 
-    HttpResponse::Ok()
+    let stats = Collector::get_stats(started_at);
+
+    let result = json!(stats);
+
+    HttpResponse::Ok().json(result)
 }
 
 pub async fn reset() -> impl Responder {
