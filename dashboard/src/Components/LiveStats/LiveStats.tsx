@@ -5,11 +5,18 @@ import { RunnerStatus, Stats } from '../../typings';
 import { useInterval } from '../../hooks/useInterval';
 import { Statistic, Row, Col, Button, Select, Badge } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
+import { fetchStats } from '../../redux/actions/statsActions';
+import { useDispatch } from 'react-redux';
 
-export function LiveStats({ stats, getState, status }: LiveStatsProps) {
+export function LiveStats({ stats, status }: LiveStatsProps) {
   const [fetchPeriod, setFetchPeriod] = React.useState(0);
+  const dispatch = useDispatch();
 
-  useInterval(fetchPeriod, getState);
+  const intervalHandler = React.useCallback(() => {
+    dispatch(fetchStats());
+  }, []);
+
+  useInterval(fetchPeriod, intervalHandler);
 
   const onFetchPeriodChange = React.useCallback((value: string) => {
     const period = Number(value);
@@ -62,5 +69,4 @@ export function LiveStats({ stats, getState, status }: LiveStatsProps) {
 interface LiveStatsProps {
   stats: Stats;
   status: RunnerStatus;
-  getState: Function;
 }
