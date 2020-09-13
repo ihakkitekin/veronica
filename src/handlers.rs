@@ -34,6 +34,7 @@ pub async fn start_runner(query: web::Json<StartRunnerQuery>, data: web::Data<Se
     HttpResponse::Ok()
 }
 
+// TODO: Add duration for final results
 pub async fn stop_runner(data: web::Data<ServerState>) -> impl Responder {
     #[allow(unused_assignments)]
     let mut started_at: Option<Instant> = None;

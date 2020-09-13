@@ -1,17 +1,18 @@
 import * as React from 'react';
 import './liveStats.css';
 import api from '../../services/api';
-import { Stats } from '../../typings';
-import { Button, ButtonTypes } from '../Button/Button';
+import { RunnerStatus, Stats } from '../../typings';
 import { useInterval } from '../../hooks/useInterval';
+import { Statistic, Row, Col, Button, Select, Badge } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 
-export function LiveStats({ stats, getState }: LiveStatsProps) {
+export function LiveStats({ stats, getState, status }: LiveStatsProps) {
   const [fetchPeriod, setFetchPeriod] = React.useState(0);
 
   useInterval(fetchPeriod, getState);
 
-  const onFetchPeriodChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const period = Number(e.currentTarget.value);
+  const onFetchPeriodChange = React.useCallback((value: string) => {
+    const period = Number(value);
     if (period >= 0) {
       setFetchPeriod(period);
     }
@@ -21,26 +22,45 @@ export function LiveStats({ stats, getState }: LiveStatsProps) {
     await api.resetRunner();
   }, []);
 
+  const badge = status === RunnerStatus.Running
+    ? <Badge status="processing" text="Running" />
+    : <Badge status="default" text="Stopped" />
+
   return <div className="live-stats">
-    <h3>Live Stats</h3>
-    <div><b>Count: </b> {stats.count}</div>
-    <div><b>Average Time: </b> {stats.average_time.toFixed(2)} ms</div>
-    <div><b>RPS: </b> {stats.rps}</div>
-    <div><b>Error Count: </b> {stats.error_count}</div>
-    <div>
-      <b>Auto Fetch: </b>
-      <select onChange={onFetchPeriodChange}>
-        <option value="0">Turn Off</option>
-        <option value="1000">1s</option>
-        <option value="5000">5s</option>
-        <option value="10000">10s</option>
-      </select>
-    </div>
-    <Button buttonType={ButtonTypes.Error} onClick={onResetClick}>Reset</Button>
+    <h3 style={{ display: 'flex', justifyContent: 'space-between' }}>Live Stats
+      <div>
+        <SyncOutlined spin={fetchPeriod > 0} style={{ marginRight: 5 }} />
+        <Select onChange={onFetchPeriodChange} defaultValue="0" style={{ width: 60, marginRight: 5 }} size="small">
+          <Select.Option value="0">Off</Select.Option>
+          <Select.Option value="1000">1s</Select.Option>
+          <Select.Option value="5000">5s</Select.Option>
+          <Select.Option value="10000">10s</Select.Option>
+        </Select>
+        <Button onClick={onResetClick} size="small" danger>Reset</Button>
+      </div>
+    </h3>
+    <Row gutter={20}>
+      <Col span={4}>
+        <Statistic title="Status" formatter={() => badge} />
+      </Col>
+      <Col span={4}>
+        <Statistic title="Count" value={stats.count} />
+      </Col>
+      <Col span={6}>
+        <Statistic title="Average Time(ms)" value={stats.average_time} precision={2} />
+      </Col>
+      <Col span={4}>
+        <Statistic title="RPS" value={stats.rps} />
+      </Col>
+      <Col span={6}>
+        <Statistic title="Error Count" value={stats.error_count} />
+      </Col>
+    </Row>
   </div>
 }
 
 interface LiveStatsProps {
   stats: Stats;
+  status: RunnerStatus;
   getState: Function;
 }

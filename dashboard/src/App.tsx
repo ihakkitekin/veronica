@@ -9,21 +9,26 @@ import { Runner } from './Pages/Runner/Runner';
 
 import './app.css';
 import { Home } from './Pages/Home/Home';
-
+import { NotFound } from './Pages/NotFound/NotFound';
 
 export function App() {
   return (
     <BrowserRouter>
       <div className="app">
         <Header />
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/runner">
-            <Runner />
-          </Route>
-        </Switch>
+        <div className="content">
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route exact path="/runner">
+              <Runner />
+            </Route>
+            <Route>
+              <NotFound />
+            </Route>
+          </Switch>
+        </div>
       </div>
     </BrowserRouter>
   )

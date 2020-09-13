@@ -1,7 +1,11 @@
 .header {
   height: 60px;
-  border: 1px solid #efefef;
   width: 100%;
   font-size: 24px;
   text-align: center;
+  display: flex;
+}
+
+.header .header-title {
+  margin: 0 50px 0 0;
 }
