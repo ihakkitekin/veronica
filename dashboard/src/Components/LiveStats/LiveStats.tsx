@@ -30,11 +30,11 @@ export function LiveStats({ stats, status }: LiveStatsProps) {
   }, []);
 
   const badge = status === RunnerStatus.Running
-    ? <Badge status="processing" text="Running" />
-    : <Badge status="default" text="Stopped" />
+    ? <Badge status="processing" style={{ lineHeight: 1 }} />
+    : <Badge status="default" style={{ lineHeight: 1 }} />
 
   return <div className="live-stats">
-    <h3 style={{ display: 'flex', justifyContent: 'space-between' }}>Live Stats
+    <h4 style={{ display: 'flex', justifyContent: 'space-between' }}>Live Stats
       <div>
         <SyncOutlined spin={fetchPeriod > 0} style={{ marginRight: 5 }} />
         <Select onChange={onFetchPeriodChange} defaultValue="0" style={{ width: 60, marginRight: 5 }} size="small">
@@ -45,22 +45,37 @@ export function LiveStats({ stats, status }: LiveStatsProps) {
         </Select>
         <Button onClick={onResetClick} size="small" danger>Reset</Button>
       </div>
-    </h3>
-    <Row gutter={20}>
-      <Col span={4}>
-        <Statistic title="Status" formatter={() => badge} />
+    </h4>
+    <Row gutter={24}>
+      <Col span={6}>
+        <div className="flex flex-c live-stats-stat">
+          <div><b>Status</b></div>
+          <div>{badge}</div>
+        </div>
       </Col>
-      <Col span={4}>
-        <Statistic title="Count" value={stats.count} />
+      <Col span={3}>
+        <div className="flex flex-c live-stats-stat">
+          <div><b>Count</b></div>
+          <div>{stats.count}</div>
+        </div>
       </Col>
       <Col span={6}>
-        <Statistic title="Average Time(ms)" value={stats.average_time} precision={2} />
+        <div className="flex flex-c live-stats-stat">
+          <div><b>Average Time</b></div>
+          <div>{stats.average_time.toFixed(2)} ms</div>
+        </div>
       </Col>
-      <Col span={4}>
-        <Statistic title="RPS" value={stats.rps} />
+      <Col span={3}>
+        <div className="flex flex-c live-stats-stat">
+          <div><b>RPS</b></div>
+          <div>{stats.rps}</div>
+        </div>
       </Col>
       <Col span={6}>
-        <Statistic title="Error Count" value={stats.error_count} />
+        <div className="flex flex-c live-stats-stat">
+          <div><b>Error Count</b></div>
+          <div>{stats.error_count}</div>
+        </div>
       </Col>
     </Row>
   </div>

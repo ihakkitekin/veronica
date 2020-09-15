@@ -9,18 +9,7 @@ export interface StatsState {
 
 const initalState: StatsState = {
   status: RunnerStatus.Stopped,
-  results: [{
-    average_time: 1.2,
-    count: 4,
-    error_count: 0,
-    rps: 0
-  },
-  {
-    average_time: 1.2,
-    count: 4,
-    error_count: 0,
-    rps: 0
-  }]
+  results: []
 }
 
 export function statsReducer(state: StatsState = initalState, action: StatsMutationTypes): StatsState {
