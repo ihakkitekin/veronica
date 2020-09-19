@@ -1,3 +1,4 @@
+use crate::task::Task;
 use crate::collector::Collector;
 use crate::{server_state::ServerState};
 use actix_web::{HttpResponse, Responder, web};
@@ -26,9 +27,9 @@ pub async fn stats(data: web::Data<ServerState>) -> impl Responder {
     HttpResponse::Ok().json(result)
 }
 
-pub async fn start_runner(query: web::Json<StartRunnerQuery>, data: web::Data<ServerState>) -> impl Responder {
+pub async fn start_runner(body: web::Json<StartRunnerQuery>, data: web::Data<ServerState>) -> impl Responder {
     {
-        data.task_manager.lock().unwrap().start_runner(&query.url, query.worker_count);
+        data.task_manager.lock().unwrap().init_runners(&body.tasks, body.worker_count);
     }
 
     HttpResponse::Ok()
@@ -59,6 +60,6 @@ pub async fn reset() -> impl Responder {
 
 #[derive(Deserialize)]
 pub struct StartRunnerQuery {
-    url: String,
+    tasks: Vec<Task>,
     worker_count: u64
 }

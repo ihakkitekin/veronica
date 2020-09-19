@@ -1,5 +1,7 @@
 .test-result {
-  width: 600px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .test-result .test-result-stat {

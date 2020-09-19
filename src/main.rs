@@ -10,6 +10,7 @@ mod server;
 mod enums;
 mod routes;
 mod server_state;
+mod task;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

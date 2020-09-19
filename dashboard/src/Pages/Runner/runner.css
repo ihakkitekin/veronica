@@ -1,16 +1,24 @@
-.runner-page {}
+.runner-page {
+  width: 80%;
+}
 
-.runner-page .runner-form {
+.runner-page-content {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 30px;
+  /* justify-content: space-between; */
+  width: 100%;
 }
 
-.runner-page .runner-form input:not(:last-child) {
-  margin-bottom: 10px;
+.runner-page-content-left {
+  width: 40%;
+  margin-right: 50px;
 }
 
-.runner-page .runner-form .button {
-  align-self: center;
-  width: 30%;
+.runner-page-content-left > div:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.runner-page-content-right {
+}
+
+.runner-page-content-right > div:not(:last-child) {
 }

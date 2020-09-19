@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 import { AppState } from '../reducers';
 import api from '../../services/api';
 import { addResult, setStats, setStatus } from '../mutations/statsMutations';
-import { RunnerStatus } from '../../typings';
+import { RunnerStatus, TaskRequest } from '../../typings';
 
 export const FETCH_STATS = 'FETCH_STATS';
 
@@ -30,9 +30,9 @@ export function fetchStats() {
   }
 }
 
-export function startRunner(url: string, workerCount: number) {
+export function startRunner(tasks: TaskRequest[], workerCount: number) {
   return async function (dispatch: Dispatch, getState: () => AppState): Promise<void> {
-    const response = await api.startRunner(url, workerCount);
+    const response = await api.startRunner(tasks, workerCount);
 
     if (response.result) {
       dispatch(setStatus(RunnerStatus.Running));

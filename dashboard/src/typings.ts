@@ -23,3 +23,8 @@ export enum RunnerStatus {
   Stopped = 'Stopped',
   Running = 'Running'
 }
+
+export interface TaskRequest {
+  url: string;
+  weight: number;
+}

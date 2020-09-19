@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RunnerResponse, ApiResponse, Stats } from '../typings';
+import { RunnerResponse, ApiResponse, Stats, TaskRequest } from '../typings';
 
 async function getStats(): Promise<ApiResponse<RunnerResponse>> {
   try {
@@ -14,10 +14,10 @@ async function getStats(): Promise<ApiResponse<RunnerResponse>> {
   }
 }
 
-async function startRunner(url: string, workerCount: number): Promise<ApiResponse<boolean>> {
+async function startRunner(tasks: TaskRequest[], workerCount: number): Promise<ApiResponse<boolean>> {
   try {
     await axios.post('/api/runner/start', {
-      url,
+      tasks,
       worker_count: workerCount
     });
 

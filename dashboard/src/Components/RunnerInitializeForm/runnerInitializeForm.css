@@ -1,0 +1,39 @@
+.runner-initialize-form {
+  width: 100%;
+}
+
+.runner-initialize-form .runner-field:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.runner-initialize-form .runner-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.runner-initialize-form .runner-task > *:first-child {
+  width: 65%;
+  margin-right: 5px;
+}
+
+.runner-initialize-form .runner-task > *:nth-child(2) {
+  width: 25%;
+}
+
+.runner-initialize-form .runner-task > *:last-child {
+
+}
+
+.runner-initialize-form .runner-task > *:last-child svg {
+  transition: all 0.3s ease;
+}
+
+.runner-initialize-form .runner-task > *:last-child svg:hover {
+  fill: #ff4d4f;
+}
+
+.runner-initialize-form .button {
+  align-self: center;
+  width: 30%;
+}

@@ -2,6 +2,19 @@
   width: 400px;
 }
 
+.live-stats-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.live-stats > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.live-stats .runner-stop-button {
+  width: 100%;
+}
+
 .live-stats .live-stats-stat {
   text-align: center;
   font-size: 12px;
